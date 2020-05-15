@@ -4,7 +4,6 @@ import java.util.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.tools.javac.util.Convert;
 
 public class parseJson {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -40,28 +39,41 @@ public class parseJson {
 //        System.out.println(dueTodayVal);
 
         List<String> orderTypeList = node.findValuesAsText("orderType");
-        for (String each : orderTypeList) System.out.println(each);
+//        for (String each : orderTypeList) System.out.println(each);
 
         List<String> dueTodayList = node.findValuesAsText("dueToday");
-        for (String each : dueTodayList) System.out.println(each);
+//        for (String each : dueTodayList) System.out.println(each);
 
         List<String> emailList = node.findValuesAsText("email");
         Collections.sort(emailList);
-        for (String each : emailList) System.out.println(each);
+//        for (String each : emailList) System.out.println(each);
 
         JsonNode shippingAddress = node.findValue("shippingAddress");
         Iterator<String> it = shippingAddress.fieldNames();
         List<String> shippingAddressList = new ArrayList();
-        String temp = "";
+
+        //we should use StringBuilder instead of String for heap memory occupation
+//         String temp = "";
+//         while (it.hasNext()) {
+//         String field = it.next();
+//                //shippingAddressList.add(shippingAddress.findValue(field).asText());
+//             temp += shippingAddress.findValue(field).asText();
+//             if(it.hasNext()){
+//                 temp+= ",";
+//             }
+//         }
+//         shippingAddressList.add(temp);
+
+        StringBuilder tempsb =new StringBuilder();
         while (it.hasNext()) {
             String field = it.next();
-            //shippingAddressList.add(shippingAddress.findValue(field).asText());
-            temp += shippingAddress.findValue(field).asText();
+            tempsb.append(shippingAddress.findValue(field).asText());
+
             if(it.hasNext()){
-                temp+= ",";
+                tempsb.append(",");
             }
         }
-        shippingAddressList.add(temp);
+        shippingAddressList.add(tempsb.toString());
 
         ObjectNode jsonObject = new ObjectMapper().createObjectNode();
 
@@ -84,18 +96,17 @@ public class parseJson {
         for (String each : shippingAddressList){
             shippingAddressNodes.add(each);
         }
-        System.out.println(jsonObject);
+//        System.out.println(jsonObject);
 
 //         Convert to String and output to text file
         String jsonString = jsonObject.toString().replaceAll("\\[", "\\{")
                                                  .replaceAll("\\]", "\\}")
                                                  .replaceAll("\"", "\'");
-        System.out.println(jsonString);
+//        System.out.println(jsonString);
 
         OutputStream os = new FileOutputStream("output.txt");
         byte[] bufferOut = jsonString.getBytes();
         os.write(bufferOut);
         os.close();
-
     }
 }
